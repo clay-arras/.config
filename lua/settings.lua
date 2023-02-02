@@ -10,7 +10,6 @@ opt.termguicolors = true
 -- Light/dark mode
 vim.api.nvim_set_option('background', 'dark')
 cmd('colorscheme gruvbox')
-
 cmd('highlight Normal guibg=NONE ctermbg=NONE')
 
 opt.autoindent    = true
@@ -22,19 +21,9 @@ opt.incsearch     = true
 
 opt.showcmd       = true
 opt.confirm       = true
--- opt.nofoldenable  = true
 
 opt.mouse         = ""
-
--- Backup files
-HOME                  = '~/.local/share/nvim'
-
-opt.backup          = true                   -- Use backup files
-opt.writebackup     = false
-opt.swapfile        = false                  -- Do not use swap file
-opt.undodir         = HOME .. '/tmp/undo/'   -- Undo files
-opt.backupdir       = HOME .. '/tmp/backup/' -- Backups
-opt.directory       = HOME .. '/tmp/swap/'   -- Swap files
+opt.nrformats     = 'alpha'
 
 -- Tab settings
 opt.expandtab     = true
@@ -42,9 +31,10 @@ opt.tabstop       = 4
 opt.softtabstop   = 4
 opt.shiftwidth    = 4
 
--- NOT WORKING: TODO
-opt.wildmode      = {longest = true, list = true}
-opt.clipboard     = {unnamedplus = true}
+-- Menu completion and clipboard
+opt.wildmenu      = true
+opt.wildmode      = 'list:longest,list:full'
+opt.clipboard     = 'unnamedplus'
 
 -- File encodings
 opt.fileencoding  = 'utf-8'
@@ -62,6 +52,8 @@ cmd([[
 
 -- Whitespace remover
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-  pattern = { "*" },
-  command = [[%s/\s\+$//e]],
+    pattern = { "*" },
+    command = [[%s/\s\+$//e]],
 })
+
+cmd([[autocmd BufEnter * silent! lcd %:p:h]])
