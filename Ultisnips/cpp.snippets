@@ -1,0 +1,211 @@
+snippet template "Template" b
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#ifdef LOCAL
+#include "algo/debug.h"
+#define open(x) freopen(x, "r", stdin);
+#else
+#define open(x)
+#endif
+
+void solve() {
+
+}
+
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0);
+    open("input.txt");
+
+    int t=1;
+    while (t--) {
+        solve();
+    }
+}
+
+endsnippet
+
+snippet DSU "Disjoint Set Union" b
+
+struct DSU {
+	vector<int> e;
+    void init(int N) {
+        e = vector<int>(N,-1);
+    }
+	int get(int x) {
+        if (e[x] < 0)
+            return x;
+        return e[x] = get(e[x]);
+    }
+	int size(int x) {
+        return -e[get(x)];
+    }
+	bool unite(int x, int y) {
+		x = get(x), y = get(y);
+        if (x == y)
+            return 0;
+		if (e[x] > e[y])
+            swap(x,y);
+		e[x] += e[y];
+        e[y] = x;
+        return 1;
+	}
+};
+
+endsnippet
+
+snippet SegTree "Segment Tree" b
+
+template<class T>
+struct SegTree {
+    static constexpr T unit = 0;
+    T f(T a, T b) { return a + b; }
+
+    vector<T> tree; int n;
+    SegTree (int i = 0, T def = unit) : tree(2*i, def), n(i) {}
+
+    void update(int pos, T val) {
+        for (tree[pos += n] = val; pos /= 2;)
+            tree[pos] = f(tree[pos * 2], tree[pos * 2 + 1]);
+    }
+    T query(int b, int e) {
+        T ra = unit, rb = unit;
+        for (b += n, e += n; b < e; b /= 2, e /= 2) {
+            if (b % 2) ra = f(ra, tree[b++]);
+            if (e % 2) rb = f(tree[--e], rb);
+        }
+        return f(ra, rb);
+    }
+};
+
+endsnippet
+
+snippet LCA "Lowest Common Ancestor" b
+
+int n, timer = 0;
+vector<int> graph[MX];
+int tin[MX], euler_tour[MX], segtree[MX];
+
+void dfs(int node=0, int parent=-1) {
+    tin[node] = timer;
+    euler_tour[timer++] = node;
+    for (int i : graph[node]) {
+        if (i != parent) {
+            dfs(i, node);
+            euler_tour[timer++] = node;
+        }
+    }
+}
+int mn_tin (int x, int y) {
+    if (x == -1)
+        return y;
+    if (y == -1)
+        return x;
+    return (tin[x] < tin[y] ? x : y);
+}
+void build (int node=1, int l=0, int r=timer-1) {
+    if (l == r) segtree[node] = euler_tour[l];
+    else {
+        int mid = (l + r) / 2;
+        build(node * 2, l, mid);
+        build(node * 2 + 1, mid + 1, r);
+        segtree[node] = mn_tin(segtree[node * 2], segtree[node * 2 + 1]);
+    }
+}
+int query (int a, int b, int node=1, int l=0, int r=timer-1) {
+    if (l > b or r < a)
+        return -1;
+    if (l >= a and r <= b)
+        return segtree[node];
+    int mid = (l + r) / 2;
+    return mn_tin(query(a, b, node*2, l, mid), query(a, b, node*2+1, mid+1, r));
+}
+int lca (int a, int b) {
+    if (tin[a] > tin[b])
+        swap(a, b);
+    return query(tin[a], tin[b]);
+}
+
+endsnippet
+
+snippet BIN "Binary Indexed Tree" b
+
+template <int... ArgsT>
+struct BIT {
+    int val = 0;
+    void update(int val) {
+        this->val += val;
+    }
+    int query() {
+        return val;
+    }
+};
+
+template <int N, int... Ns>
+struct BIT<N, Ns...> {
+    BIT<Ns...> bit[N + 1];
+    template<typename... Args>
+    void update(int pos, Args... args) {
+        for (; pos <= N; bit[pos].update(args...), pos += lastbit(pos));
+    }
+
+    template<typename... Args>
+    int query(int l, int r, Args... args) {
+        int ans = 0;
+        for (; r >= 1; ans += bit[r].query(args...), r -= lastbit(r));
+        for (--l; l >= 1; ans -= bit[l].query(args...), l -= lastbit(l));
+        return ans;
+    }
+    inline int lastbit(int x) {
+        return x & (-x);
+    }
+};
+
+endsnippet
+
+snippet Kruskals "Kruskals Algorithm" b
+
+template<class T> T
+Kruskals (int N, vector<pair<T, pair<int, int>>> e) {
+    sort(e.begin(), e.end());
+    DSU D; D.init(N+1);
+    T ans = 0;
+    for (auto &a : e) {
+        if (D.unite(a.second.first, a.second.second)) {
+            adj_list[a.second.first].push_back({a.second.second, a.first});
+            adj_list[a.second.second].push_back({a.second.first, a.first});
+            ans += a.first;
+        }
+    }
+    return ans;
+}
+
+endsnippet
+
+snippet Dijkstras "Dijkstras Algorithm" b
+
+template<class T>
+vector<T> Dijkstras(T src, int N) {
+    const T mxV = 1e18;
+    vector<T> dist(N, mxV);
+    priority_queue<pair<T, T>, vector<pair<T, T>>, greater<pair<T, T>>> q;
+
+	dist[src] = 0;
+	q.push({0, src});
+	while ((T)q.size()) {
+		T x=q.top().first, u=q.top().second;
+        q.pop();
+
+		if (x != dist[u]) continue;
+		for (auto i : adj_list[u]) {
+			if (x+i.second < dist[i.first]) {
+                dist[i.first] = x+i.second;
+				q.push({dist[i.first], i.first});
+			}
+		}
+	}
+    return dist;
+}
+
+endsnippet
