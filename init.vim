@@ -10,6 +10,7 @@ call plug#begin()
     Plug 'junegunn/vim-easy-align'                      " Simple alignment
     Plug 'tpope/vim-unimpaired'                         " Faster navigation
     Plug 'psliwka/vim-smoothie'                         " Smooth scrolling
+    Plug 'ctrlpvim/ctrlp.vim'                           " Navigating buffers
     Plug 'SirVer/ultisnips'                             " Snippet engine
     Plug 'mg979/vim-visual-multi', {'branch': 'master'} " Multiple cursors
     Plug 'tpope/vim-fugitive'                           " Git wrapper
@@ -44,7 +45,8 @@ set confirm
 set nobackup
 set nowritebackup
 set nowrap
-set statusline=%#PmenuSel#%#LineNr#%f\ %h%w%m%r%=%#CursorColumn#%-20.(%4l,%c%V\ %=\ %P%)
+set statusline=%#PmenuSel#%#LineNr#%f
+set statusline+=%h%w%m%r%=%#CursorColumn#%-20.(%4l,%c%V\ %=\ %P%)
 
 set number relativenumber
 augroup Numbertoggle
@@ -54,14 +56,14 @@ augroup Numbertoggle
 augroup END
 
 let mapleader = " "
-let g:smoothie_enabled = 1
 let g:indentLine_char = '.'
+let g:smoothie_enabled = 1
+let g:ctrlp_working_path_mode = 'c'
 let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
-let g:UltiSnipsEditSplit="vertical"
 let g:UltiSnipsExpandTrigger="<CR>"
 
 let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -l -g ""'
-let g:fzf_layout = { 'down': '20%' }
+let g:fzf_layout = { 'down': '40%' }
 let g:ale_linters = {
     \ 'python': ['pylint'],
     \ 'vim': ['vint'],
@@ -120,19 +122,8 @@ endfunction
 inoremap <expr> j JKescape('j')
 inoremap <expr> k JKescape('k')
 
-function! NormCycleCmd()
-    let g:call_lasttime = 1
-    execute "Buffers"
-endfunction
-function! CycleCmd()
-    if g:call_lasttime == 0 | silent execute "normal :q\<CR>:Buffers\<CR>" | endif
-    if g:call_lasttime == 1 | silent execute "normal :q\<CR>:Files .\<CR>" | endif
-    if g:call_lasttime == 2 | silent execute "normal :q\<CR>:call fzf#run({'sink': 'Files', 'source': 'find ~ -type d',  'down': '20%', 'options': '--multi' })\<CR>" | endif
-    sleep 5m | silent execute "normal \<C-w>ji"
-    let g:call_lasttime = (g:call_lasttime + 1) % 3
-endfunction
-tnoremap <c-space> <C-\><C-N>:call CycleCmd()<CR>
-nnoremap <c-space> :call NormCycleCmd()<CR>
+nnoremap <leader>fd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
+nnoremap <leader>ff :Files ~<CR>
 
 tnoremap <C-C> <C-\><C-n>:bn<CR>:bd#<CR>
 nnoremap <Esc><Esc> :let @/=""<CR><Esc>
