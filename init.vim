@@ -15,7 +15,7 @@ call plug#begin()
     Plug 'mg979/vim-visual-multi', {'branch': 'master'} " Multiple cursors
     Plug 'tpope/vim-fugitive'                           " Git wrapper
     Plug 'simeji/winresizer'                            " Window manager
-    Plug 'morhetz/gruvbox'                              " Colorscheme
+    Plug 'rafi/awesome-vim-colorschemes'                " Colorscheme
 call plug#end()
 filetype plugin indent on
 syntax on
@@ -23,7 +23,10 @@ syntax on
 set t_Co=256
 set termguicolors
 set background=dark
-colorscheme gruvbox
+" colorscheme gruvbox
+
+let my_colorschemes = ['256_noir', 'OceanicNext', 'OceanicNextLight', 'PaperColor', 'abstract', 'afterglow', 'alduin', 'anderson', 'angr', 'apprentice', 'archery', 'atom', 'ayu', 'blue', 'carbonized-dark', 'carbonized-light', 'challenger_deep', 'darkblue', 'deep-space', 'default', 'delek', 'desert', 'deus', 'dogrun', 'elflord', 'evening', 'flattened_dark', 'flattened_light', 'focuspoint', 'fogbell', 'fogbell_light', 'fogbell_lite', 'github', 'gotham', 'gotham256', 'gruvbox', 'happy_hacking', 'hybrid', 'hybrid_material', 'hybrid_reverse', 'iceberg', 'industry', 'jellybeans', 'koehler', 'lightning', 'lucid', 'lucius', 'materialbox', 'meta5', 'minimalist', 'molokai', 'molokayo', 'morning', 'mountaineer', 'mountaineer-grey', 'mountaineer-light', 'murphy', 'nord', 'oceanic_material', 'one', 'one-dark', 'onedark', 'onehalfdark', 'onehalflight', 'orange-moon', 'orbital', 'pablo', 'paramount', 'parsec', 'peachpuff', 'pink-moon', 'purify', 'pyte', 'rakr', 'rdark-terminal2', 'ron', 'scheakur', 'seoul256', 'seoul256-light', 'shine', 'sierra', 'slate', 'snow', 'solarized8', 'solarized8_flat', 'solarized8_high', 'solarized8_low', 'sonokai', 'space-vim-dark', 'spacecamp', 'spacecamp_lite', 'stellarized', 'sunbather', 'tender', 'termschool', 'torte', 'twilight256', 'two-firewatch', 'wombat256mod', 'yellow-moon', 'zellner']
+execute 'colorscheme' my_colorschemes[rand() % (len(my_colorschemes) - 1 ) ]
 highlight Normal guibg=NONE ctermbg=NONE
 
 set autoindent
@@ -55,7 +58,7 @@ augroup Numbertoggle
     autocmd BufLeave,FocusLost,InsertEnter * set norelativenumber
 augroup END
 
-let mapleader = " "
+let mapleader = ","
 let g:indentLine_char = '.'
 let g:smoothie_enabled = 1
 let g:ctrlp_working_path_mode = 'c'
@@ -122,11 +125,11 @@ endfunction
 inoremap <expr> j JKescape('j')
 inoremap <expr> k JKescape('k')
 
-nnoremap <leader>fd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
-nnoremap <leader>ff :Files ~<CR>
+nnoremap <leader>sd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
+nnoremap <leader>sf :Files ~<CR>
 
-xmap ga <Plug>(EasyAlign)
-nmap ga <Plug>(EasyAlign)
+xnoremap ga <Plug>(EasyAlign)
+nnoremap ga <Plug>(EasyAlign)
 
 tnoremap <C-C> <C-\><C-n>:bn<CR>:bd#<CR>
 nnoremap <Esc><Esc> :let @/=""<CR><Esc>
@@ -136,17 +139,12 @@ nnoremap Y y$
 nnoremap J mzJ`z
 inoremap ; ;<c-g>u
 
-noremap ( )
-noremap ) (
 noremap { }
 noremap } {
-nnoremap Q @q
-vnoremap Q :norm @q<CR>
 inoremap {<CR> {<CR>}<Esc>O
 
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
-vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 vnoremap / <Esc>/\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
 vnoremap ? <Esc>?\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
 inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
