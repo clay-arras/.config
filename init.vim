@@ -125,6 +125,9 @@ inoremap <expr> k JKescape('k')
 nnoremap <leader>fd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
 nnoremap <leader>ff :Files ~<CR>
 
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
+
 tnoremap <C-C> <C-\><C-n>:bn<CR>:bd#<CR>
 nnoremap <Esc><Esc> :let @/=""<CR><Esc>
 nnoremap n n<cmd>call smoothie#do("zz") <CR>
