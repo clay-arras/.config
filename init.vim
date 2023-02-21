@@ -23,9 +23,14 @@ syntax on
 set t_Co=256
 set termguicolors
 set background=dark
-" colorscheme gruvbox
 
-let my_colorschemes = ['256_noir', 'OceanicNext', 'OceanicNextLight', 'PaperColor', 'abstract', 'afterglow', 'alduin', 'anderson', 'angr', 'apprentice', 'archery', 'atom', 'ayu', 'blue', 'carbonized-dark', 'carbonized-light', 'challenger_deep', 'darkblue', 'deep-space', 'default', 'delek', 'desert', 'deus', 'dogrun', 'elflord', 'evening', 'flattened_dark', 'flattened_light', 'focuspoint', 'fogbell', 'fogbell_light', 'fogbell_lite', 'github', 'gotham', 'gotham256', 'gruvbox', 'happy_hacking', 'hybrid', 'hybrid_material', 'hybrid_reverse', 'iceberg', 'industry', 'jellybeans', 'koehler', 'lightning', 'lucid', 'lucius', 'materialbox', 'meta5', 'minimalist', 'molokai', 'molokayo', 'morning', 'mountaineer', 'mountaineer-grey', 'mountaineer-light', 'murphy', 'nord', 'oceanic_material', 'one', 'one-dark', 'onedark', 'onehalfdark', 'onehalflight', 'orange-moon', 'orbital', 'pablo', 'paramount', 'parsec', 'peachpuff', 'pink-moon', 'purify', 'pyte', 'rakr', 'rdark-terminal2', 'ron', 'scheakur', 'seoul256', 'seoul256-light', 'shine', 'sierra', 'slate', 'snow', 'solarized8', 'solarized8_flat', 'solarized8_high', 'solarized8_low', 'sonokai', 'space-vim-dark', 'spacecamp', 'spacecamp_lite', 'stellarized', 'sunbather', 'tender', 'termschool', 'torte', 'twilight256', 'two-firewatch', 'wombat256mod', 'yellow-moon', 'zellner']
+let my_colorschemes = ['256_noir', 'OceanicNext', 'OceanicNextLight', 'PaperColor', 'abstract', 'afterglow', 'alduin', 'anderson', 'angr', 'apprentice', 'archery', 'atom', 'ayu', 'blue',
+            \'carbonized-dark', 'carbonized-light', 'challenger_deep', 'darkblue', 'deep-space', 'default', 'delek', 'desert', 'deus', 'dogrun', 'elflord', 'evening', 'flattened_dark',
+            \'flattened_light', 'focuspoint', 'fogbell', 'fogbell_light', 'fogbell_lite', 'github', 'gotham', 'gotham256', 'gruvbox', 'happy_hacking', 'hybrid', 'hybrid_material', 'hybrid_reverse',
+            \'iceberg', 'industry', 'jellybeans', 'koehler', 'lightning', 'lucid', 'lucius', 'materialbox', 'meta5', 'minimalist', 'molokai', 'molokayo', 'morning', 'mountaineer', 'mountaineer-grey',
+            \'mountaineer-light', 'murphy', 'nord', 'oceanic_material', 'one', 'one-dark', 'onedark', 'onehalfdark', 'onehalflight', 'orange-moon', 'orbital', 'pablo', 'paramount', 'parsec', 'peachpuff',
+            \'pink-moon', 'purify', 'pyte', 'rakr', 'rdark-terminal2', 'ron', 'scheakur', 'seoul256', 'seoul256-light', 'shine', 'sierra', 'slate', 'snow', 'solarized8', 'solarized8_flat', 'solarized8_high',
+            \'solarized8_low', 'sonokai', 'space-vim-dark', 'spacecamp', 'spacecamp_lite', 'stellarized', 'sunbather', 'tender', 'termschool', 'torte', 'twilight256', 'two-firewatch', 'wombat256mod', 'yellow-moon', 'zellner']
 execute 'colorscheme' my_colorschemes[rand() % (len(my_colorschemes) - 1 ) ]
 highlight Normal guibg=NONE ctermbg=NONE
 
@@ -86,7 +91,8 @@ augroup CPP
     autocmd!
     autocmd FileType cpp command! -bar Compile w | execute join(g:gtimeComp) . join(g:gppComp) . "%:r %"
     autocmd FileType cpp command! Run w | silent execute "!" . join(g:gppComp) . "%:r %" | silent execute join(g:gtimeComp) . './.%:r;'
-    autocmd FileType cpp nnoremap <leader>c <Esc>:Run<CR>
+    autocmd FileType cpp nnoremap <leader>cc <Esc>:Run<CR>
+    autocmd FileType cpp nnoremap <leader>cp <Esc>:Compile<CR>
 augroup END
 
 command! Terminal silent exe '! osascript
@@ -125,19 +131,23 @@ endfunction
 inoremap <expr> j JKescape('j')
 inoremap <expr> k JKescape('k')
 
+nnoremap <leader>er  :<c-u><c-r><c-r>='let @'. v:register .' = '. string(getreg(v:register))<cr><c-f><left>
 nnoremap <leader>sd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
 nnoremap <leader>sf :Files ~<CR>
 
+nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 xnoremap ga <Plug>(EasyAlign)
 nnoremap ga <Plug>(EasyAlign)
 
 tnoremap <C-C> <C-\><C-n>:bn<CR>:bd#<CR>
-nnoremap <Esc><Esc> :let @/=""<CR><Esc>
+nnoremap <C-L> :noh<CR><C-L>
 nnoremap n n<cmd>call smoothie#do("zz") <CR>
 nnoremap N N<cmd>call smoothie#do("zz") <CR>
 nnoremap Y y$
 nnoremap J mzJ`z
 inoremap ; ;<c-g>u
+nnoremap c* /\<<C-R>=expand('<cword>')<CR>\>\C<CR>``cgn
+nnoremap c# ?\<<C-R>=expand('<cword>')<CR>\>\C<CR>``cgN
 
 noremap { }
 noremap } {
@@ -147,7 +157,7 @@ vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
 vnoremap / <Esc>/\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
 vnoremap ? <Esc>?\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <Tab> pumvisible() ? "\<C-N>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-P>" : "\<S-Tab>"
 nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
 nnoremap <expr> j (v:count > 5 ? "m'" . v:count : "") . 'j'
