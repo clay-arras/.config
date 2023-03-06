@@ -1,5 +1,4 @@
-snippet template "Template" b
-
+snippet Template "Template" b
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -24,10 +23,14 @@ int main() {
     }
 }
 
+/*
+
+
+
+*/
 endsnippet
 
 snippet DSU "Disjoint Set Union" b
-
 struct DSU {
 	vector<int> e;
     void init(int N) {
@@ -52,11 +55,9 @@ struct DSU {
         return 1;
 	}
 };
-
 endsnippet
 
 snippet SegTree "Segment Tree" b
-
 template<class T>
 struct SegTree {
     static constexpr T unit = 0;
@@ -78,11 +79,9 @@ struct SegTree {
         return f(ra, rb);
     }
 };
-
 endsnippet
 
 snippet LCA "Lowest Common Ancestor" b
-
 int n, timer = 0;
 vector<int> graph[MX];
 int tin[MX], euler_tour[MX], segtree[MX];
@@ -126,11 +125,9 @@ int lca (int a, int b) {
         swap(a, b);
     return query(tin[a], tin[b]);
 }
-
 endsnippet
 
 snippet BIN "Binary Indexed Tree" b
-
 template <int... ArgsT>
 struct BIT {
     int val = 0;
@@ -161,11 +158,9 @@ struct BIT<N, Ns...> {
         return x & (-x);
     }
 };
-
 endsnippet
 
 snippet Kruskals "Kruskals Algorithm" b
-
 template<class T> T
 Kruskals (int N, vector<pair<T, pair<int, int>>> e) {
     sort(e.begin(), e.end());
@@ -180,11 +175,9 @@ Kruskals (int N, vector<pair<T, pair<int, int>>> e) {
     }
     return ans;
 }
-
 endsnippet
 
 snippet Dijkstras "Dijkstras Algorithm" b
-
 template<class T>
 vector<T> Dijkstras(T src, int N) {
     const T mxV = 1e18;
@@ -207,5 +200,145 @@ vector<T> Dijkstras(T src, int N) {
 	}
     return dist;
 }
+endsnippet
 
+snippet LastBS "Binary Search" b
+template<class T>
+T lastTrue(T lo, T hi, function<bool(T)> f) {
+	lo--;
+	for (T dif=hi-lo; dif>0; dif/=2) {
+		while (lo + dif <= hi && f(lo + dif)) { lo += dif; }
+	}
+	return lo;
+}
+endsnippet
+
+snippet FirstBS "Binary Search" b
+template<class T>
+firstTrue(T lo, T hi, function<bool(T)> f) {
+	hi++;
+	while (lo < hi) {
+		T mid = lo + (hi - lo) / 2;
+		if (f(mid)) hi = mid;
+		else lo = mid + 1;
+	}
+	return lo;
+}
+endsnippet
+
+snippet BFS "Breath First Search" b
+template<class T>
+vector<T> BFS(T src, int N) {
+	const T mxV = 1e18+9;
+	queue<int> q;
+	vector<T> dist(N, mxV);
+
+	dist[src] = 0;
+	q.push(src);
+	while (!q.empty()) {
+		int x = q.front();
+		q.pop();
+		for (int t : adj_list[x]) {
+			if (dist[t] == MXV) {
+				dist[t] = dist[x] + 1;
+				q.push(t);
+			}
+		}
+	}
+}
+endsnippet
+
+snippet OST "Order Statistics Tree" b
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+
+template<class T>
+using oset = tree<T, null_type,
+      less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+endsnippet
+
+snippet Sieve "Sieve of Eratosthenes" b
+template <int SZ>
+struct Sieve {
+	bitset<SZ> is_prime; vector<int> primes;
+	Sieve() {
+		is_prime.set();
+        is_prime[0]=is_prime[1]=0;
+		for (int i=4; i<SZ; i+=2) is_prime[i] = 0;
+		for (int i=3; i*i<SZ; i+=2) {
+            if (is_prime[i])
+                for (int j=i*i; j<SZ; j+=i*2)
+                    is_prime[j] = 0;
+        }
+        for (int i=0; i<SZ; i++) {
+            if (is_prime[i])
+                primes.push_back(i);
+        }
+	}
+};
+endsnippet
+
+snippet Topological "Topological Sort DFS" b
+void DFS(int v) {
+    visited[v] = true;
+    for (int u : adj_list[v]) {
+        if (!visited[u])
+            DFS(u);
+    }
+    ans.push_back(v);
+}
+
+void Topological() {
+	fill(visited, visited+N, false);
+    ans.clear();
+    for (int i=0; i<N; i++) {
+        if (!visited[i])
+            dfs(i);
+    }
+    reverse(ans.begin(), ans.end());
+}
+endsnippet
+
+snippet RMQ "RMQ" b
+template<class T>
+struct RMQ {
+	vector<T> v; vector<vector<int>> jmp;
+    int level(int x) { return 31-__builtin_clz(x); }
+	int cmb(int a, int b) {
+        if (v[a] == v[b])
+            return min(a, b);
+		return v[a] < v[b] ? a : b;
+    }
+	void init(const vector<T>& _v) {
+        int sz = (int)_v.size();
+        jmp = { vector<int>(sz) };
+		v = _v;
+		iota(jmp[0].begin(), jmp[0].end(), 0);
+		for (int j=1; (1<<j)<=sz; j++) {
+			jmp.push_back(vector<int>(sz-(1<<j)+1));
+			for (int i=0; i<(int)jmp[j].size(); i++)
+                jmp[j][i] = cmb(jmp[j-1][i], jmp[j-1][i+(1<<(j-1))]);
+		}
+	}
+	int index(int l, int r) {
+        int d = level(r-l+1);
+		assert(l <= r);
+		return cmb(jmp[d][l], jmp[d][r-(1<<d)+1]);
+    }
+	T query(int l, int r) { return v[index(l,r)]; }
+};
+endsnippet
+
+snippet Hash "GP Hash Table" b
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+
+struct chash {
+	const uint64_t C = uint64_t(2e18 * PI) + 71;
+	const uint32_t RANDOM = chrono::steady_clock::now().time_since_epoch().count();
+	size_t operator()(uint64_t x) const { return __builtin_bswap64((x ^ RANDOM) * C); }
+};
+template <class K, class V>
+gp_hash_table<K, V, chash> htable;
 endsnippet

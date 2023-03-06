@@ -1,0 +1,12 @@
+{
+    "diagnostic.displayByAle": true,
+    "diagnostic.virtualText": true,
+    "diagnostic.virtualTextCurrentLineOnly": false,
+
+    "diagnostic.errorSign": ">>",
+    "diagnostic.warningSign": "--",
+    "diagnostic.infoSign": "!",
+    "diagnostic.hintSign": "!",
+    "diagnostic.virtualTextPrefix": " // ",
+    "diagnostic.virtualTextLevel": "error"
+}
