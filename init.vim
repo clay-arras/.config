@@ -16,21 +16,22 @@ call plug#begin()
     Plug 'rafi/awesome-vim-colorschemes'
     Plug 'jiangmiao/auto-pairs'
     Plug 'wellle/targets.vim'
+    Plug 'justinmk/vim-sneak'
+    Plug 'terryma/vim-expand-region'
+    Plug 'vim-airline/vim-airline'
+    Plug 'mbbill/undotree'
 call plug#end()
 filetype plugin indent on
 syntax on
 
 set t_Co=256
 set termguicolors
-set background=dark
-colorscheme gruvbox
+colorscheme molokai
 highlight Normal guibg=NONE ctermbg=NONE
-highlight CocErrorVirtualText guibg=NONE guifg=RED
 
 set autoindent
 set expandtab
 set hlsearch
-set ignorecase
 set incsearch
 set showcmd
 set showmatch
@@ -38,9 +39,11 @@ set clipboard=unnamedplus
 set shiftwidth=4
 set softtabstop=4
 set tabstop=4
+set wildmenu
 set wildmode=longest,list
-set nowrap
 set confirm
+set nowrap
+set noswapfile
 
 set number relativenumber
 augroup Numbertoggle
@@ -49,46 +52,39 @@ augroup Numbertoggle
     autocmd BufLeave,FocusLost,InsertEnter * set norelativenumber
 augroup END
 
-let mapleader = ","
 let g:ctrlp_working_path_mode = 'c'
-let g:indentLine_char = '.'
 let g:yankring_replace_n_nkey = ']p'
 let g:yankring_replace_n_pkey = '[p'
 let g:winresizer_start_key = ''
-let g:AutoPairsFlyMode = 1
+let g:expand_region_text_objects = {'i]':1,'ib':1,'iB':1,'a]':1,'ab':1,'aB':1}
+let g:airline_section_error = ''
+let g:airline_section_warning = ''
 
-let $FZF_DEFAULT_COMMAND = 'ag --hidden --ignore .git -l -g ""'
+let $FZF_DEFAULT_COMMAND = 'ag --hidden -lg ""'
 let g:fzf_layout = { 'down': '40%' }
 let g:UltiSnipsExpandTrigger="<CR>"
 let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
-let g:coc_config_home = '~/.config/nvim/'
 let g:ale_linters = { 'cpp': ['g++'], 'c': ['gcc'] }
 let g:ale_cpp_cc_executable = 'g++'
 let g:ale_cpp_cc_options = '-Wall -O2 -std=c++17 -D LOCAL -I /usr/local/include'
 
 let g:gtimecomp = ['term cd %:p:h; gtime -f "\nMem: \%Mkb\nTime: \%es"', '']
 let g:gppcomp = [
-            \ "g++-12 -std=c++17 -D LOCAL -I /usr/local/include -Wl,-stack_size,0x10000000 -O2 ",
+            \ "!g++-12 -std=c++17 -D LOCAL -I /usr/local/include -Wl,-stack_size,0x10000000 -O2 ",
             \ "-Wall -Wextra -Wshadow -Wconversion -Wfloat-equal -Wduplicated-cond -Wlogical-op ",
             \ "-ggdb -fsanitize-undefined-trap-on-error -o ."
             \]
-augroup CPP
+augroup CPPcompile
     autocmd!
-    autocmd FileType cpp command! Run write | silent execute "!" . join(g:gppcomp) . "%:r %" | silent execute join(g:gtimecomp) . './.%:r;'
-    autocmd FileType cpp nnoremap <buffer> <leader>cc <Esc>:Run<CR>
+    autocmd FileType cpp command! Run write | silent execute join(g:gppcomp) . "%:r %" | silent execute join(g:gtimecomp) . './.%:r;'
+    autocmd FileType cpp nnoremap <buffer> <leader><leader>c <Esc>:Run<CR>
 augroup END
 
-fun! TrimWhitespace()
-    let l:save = winsaveview()
-    keeppatterns %s/\s\+$//e
-    call winrestview(l:save)
-endfun
 augroup Misc
     autocmd!
     autocmd BufEnter * silent! lcd %:p:h
+    autocmd BufWritePre * :%s/\s\+$//e
     autocmd BufWritePost ~/.config/nvim/init.vim source %
-    autocmd BufWritePre * if !&binary | call TrimWhitespace() | endif
-    autocmd TextChanged,TextChangedI <buffer> silent write
 augroup END
 
 let g:esc_j_last_time = 0
@@ -102,6 +98,8 @@ inoremap <expr> j JKescape('j')
 inoremap <expr> k JKescape('k')
 
 nnoremap <leader>er :<C-U><C-R><C-R>='let @'. v:register .' = '. string(getreg(v:register))<CR><C-F><left>
+vnoremap <leader>et ygv:.!python3 /Users/astronaut/Workspace/code/etc/chat.py "<C-R>+"<CR>
+nnoremap <leader>eh :UndotreeToggle<CR>
 nnoremap <leader>sd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
 nnoremap <leader>sf :Files ~<CR>
 nnoremap <leader>sh :History<CR>
