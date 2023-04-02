@@ -1,9 +1,6 @@
 call plug#begin()
     Plug 'neoclide/coc.nvim', {'branch': 'release'}
     Plug 'dense-analysis/ale'
-    Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-    Plug 'junegunn/fzf.vim'
-    Plug 'ctrlpvim/ctrlp.vim'
     Plug 'junegunn/vim-easy-align'
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
     Plug 'SirVer/ultisnips'
@@ -20,7 +17,6 @@ call plug#begin()
     Plug 'terryma/vim-expand-region'
     Plug 'vim-airline/vim-airline'
     Plug 'kevinhwang91/rnvimr'
-    Plug 'voldikss/vim-floaterm'
 call plug#end()
 filetype plugin indent on
 syntax on
@@ -53,7 +49,6 @@ augroup Numbertoggle
     autocmd BufLeave,FocusLost,InsertEnter * set norelativenumber
 augroup END
 
-let g:ctrlp_working_path_mode = 'c'
 let g:yankring_replace_n_nkey = ']p'
 let g:yankring_replace_n_pkey = '[p'
 let g:winresizer_start_key = ''
@@ -61,8 +56,6 @@ let g:expand_region_text_objects = {'i]':1,'ib':1,'iB':1,'a]':1,'ab':1,'aB':1}
 let g:airline_section_error = ''
 let g:airline_section_warning = ''
 
-let $FZF_DEFAULT_COMMAND = 'ag --hidden -lg ""'
-let g:fzf_layout = { 'down': '40%' }
 let g:UltiSnipsExpandTrigger="<CR>"
 let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
 let g:ale_linters = { 'cpp': ['g++'], 'c': ['gcc'] }
@@ -100,21 +93,17 @@ endfunction
 inoremap <expr> j JKescape('j')
 inoremap <expr> k JKescape('k')
 
-nnoremap <leader>er :<C-U><C-R><C-R>='let @'. v:register .' = '. string(getreg(v:register))<CR><C-F><left>
-vnoremap <leader>et ygv:.!python3 /Users/astronaut/Workspace/code/etc/chat.py "<C-R>+"<CR>
-nnoremap <leader>sd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
-nnoremap <leader>sf :Files ~<CR>
-nnoremap <leader>sh :History<CR>
-
 let g:is_ranger_open = 0
 function! RangerSwitch()
     if g:is_ranger_open == 0 | execute "norm :vnew\<CR>\<C-W>l:RnvimrToggle\<CR>" | endif
     if g:is_ranger_open == 1 | execute "norm :RnvimrToggle\<CR>\<C-\>\<C-N>:RnvimrToggle\<CR>\<C-W>h:bd!\<CR>" | endif
     let g:is_ranger_open = xor(g:is_ranger_open, 1)
 endfunction
-nnoremap <leader>ff :call RangerSwitch()<CR>
-nnoremap <space><space> :RnvimrToggle<CR>
-tnoremap <space><space> <C-\><C-N><C-W>l
+command! OpenRanger call RangerSwitch()
+nnoremap <expr> <C-;> ((g:is_ranger_open == 1) ? ":RnvimrToggle<CR>" : ":w<CR>")
+tnoremap <C-;> <C-\><C-N><C-W>l
+nnoremap <leader>er :<C-U><C-R><C-R>='let @'. v:register .' = '. string(getreg(v:register))<CR><C-F><left>
+vnoremap <leader>et ygv:.!python3 /Users/astronaut/Workspace/code/etc/chat.py "<C-R>+"<CR>
 
 nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 xnoremap ga <Plug>(EasyAlign)
