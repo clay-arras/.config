@@ -19,15 +19,16 @@ call plug#begin()
     Plug 'justinmk/vim-sneak'
     Plug 'terryma/vim-expand-region'
     Plug 'vim-airline/vim-airline'
-    Plug 'mbbill/undotree'
+    Plug 'kevinhwang91/rnvimr'
+    Plug 'voldikss/vim-floaterm'
 call plug#end()
 filetype plugin indent on
 syntax on
 
 set t_Co=256
 set termguicolors
-colorscheme molokai
 highlight Normal guibg=NONE ctermbg=NONE
+highlight NormalFloat guibg=NONE ctermbg=NONE
 
 set autoindent
 set expandtab
@@ -67,6 +68,8 @@ let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
 let g:ale_linters = { 'cpp': ['g++'], 'c': ['gcc'] }
 let g:ale_cpp_cc_executable = 'g++'
 let g:ale_cpp_cc_options = '-Wall -O2 -std=c++17 -D LOCAL -I /usr/local/include'
+let g:rnvimr_draw_border = 0
+let g:rnvimr_layout = { 'relative':'editor', 'width':float2nr(round(0.5*&columns)), 'height':float2nr(round(1*&lines)), 'col':0, 'row':0, 'style': 'minimal'}
 
 let g:gtimecomp = ['term cd %:p:h; gtime -f "\nMem: \%Mkb\nTime: \%es"', '']
 let g:gppcomp = [
@@ -90,8 +93,8 @@ augroup END
 let g:esc_j_last_time = 0
 let g:esc_k_last_time = 0
 function! JKescape(key)
-    if a:key=='j' | let g:esc_j_last_time = reltimefloat(reltime()) | endif
-    if a:key=='k' | let g:esc_k_last_time = reltimefloat(reltime()) | endif
+    if a:key == 'j' | let g:esc_j_last_time = reltimefloat(reltime()) | endif
+    if a:key == 'k' | let g:esc_k_last_time = reltimefloat(reltime()) | endif
     return abs(g:esc_j_last_time - g:esc_k_last_time) <= 0.1 ? "\b\e" : a:key
 endfunction
 inoremap <expr> j JKescape('j')
@@ -99,10 +102,19 @@ inoremap <expr> k JKescape('k')
 
 nnoremap <leader>er :<C-U><C-R><C-R>='let @'. v:register .' = '. string(getreg(v:register))<CR><C-F><left>
 vnoremap <leader>et ygv:.!python3 /Users/astronaut/Workspace/code/etc/chat.py "<C-R>+"<CR>
-nnoremap <leader>eh :UndotreeToggle<CR>
 nnoremap <leader>sd :call fzf#run({'sink':'CtrlP','source':'find ~ -type d','down': '40%','options':'--multi'})<CR>
 nnoremap <leader>sf :Files ~<CR>
 nnoremap <leader>sh :History<CR>
+
+let g:is_ranger_open = 0
+function! RangerSwitch()
+    if g:is_ranger_open == 0 | execute "norm :vnew\<CR>\<C-W>l:RnvimrToggle\<CR>" | endif
+    if g:is_ranger_open == 1 | execute "norm :RnvimrToggle\<CR>\<C-\>\<C-N>:RnvimrToggle\<CR>\<C-W>h:bd!\<CR>" | endif
+    let g:is_ranger_open = xor(g:is_ranger_open, 1)
+endfunction
+nnoremap <leader>ff :call RangerSwitch()<CR>
+nnoremap <space><space> :RnvimrToggle<CR>
+tnoremap <space><space> <C-\><C-N><C-W>l
 
 nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 xnoremap ga <Plug>(EasyAlign)
