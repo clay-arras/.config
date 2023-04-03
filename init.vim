@@ -4,7 +4,6 @@ call plug#begin()
     Plug 'junegunn/vim-easy-align'
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
     Plug 'SirVer/ultisnips'
-    Plug 'simeji/winresizer'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-unimpaired'
@@ -40,7 +39,7 @@ set wildmenu
 set wildmode=longest,list
 set confirm
 set nowrap
-set noswapfile
+set mouse=
 
 set number relativenumber
 augroup Numbertoggle
@@ -64,21 +63,8 @@ let g:ale_cpp_cc_options = '-Wall -O2 -std=c++17 -D LOCAL -I /usr/local/include'
 let g:rnvimr_draw_border = 0
 let g:rnvimr_layout = { 'relative':'editor', 'width':float2nr(round(0.5*&columns)), 'height':float2nr(round(1*&lines)), 'col':0, 'row':0, 'style': 'minimal'}
 
-let g:gtimecomp = ['term cd %:p:h; gtime -f "\nMem: \%Mkb\nTime: \%es"', '']
-let g:gppcomp = [
-            \ "!g++-12 -std=c++17 -D LOCAL -I /usr/local/include -Wl,-stack_size,0x10000000 -O2 ",
-            \ "-Wall -Wextra -Wshadow -Wconversion -Wfloat-equal -Wduplicated-cond -Wlogical-op ",
-            \ "-ggdb -fsanitize-undefined-trap-on-error -o ."
-            \]
-augroup CPPcompile
-    autocmd!
-    autocmd FileType cpp command! Run write | silent execute join(g:gppcomp) . "%:r %" | silent execute join(g:gtimecomp) . './.%:r;'
-    autocmd FileType cpp nnoremap <buffer> <leader><leader>c <Esc>:Run<CR>
-augroup END
-
 augroup Misc
     autocmd!
-    autocmd BufEnter * silent! lcd %:p:h
     autocmd BufWritePre * :%s/\s\+$//e
     autocmd BufWritePost ~/.config/nvim/init.vim source %
 augroup END
@@ -93,7 +79,7 @@ endfunction
 inoremap <expr> j JKescape('j')
 inoremap <expr> k JKescape('k')
 
-let g:is_ranger_open = 0
+if exists("g:is_ranger_open") == 0 | let g:is_ranger_open = 0 | endif
 function! RangerSwitch()
     if g:is_ranger_open == 0 | execute "norm :vnew\<CR>\<C-W>l:RnvimrToggle\<CR>" | endif
     if g:is_ranger_open == 1 | execute "norm :RnvimrToggle\<CR>\<C-\>\<C-N>:RnvimrToggle\<CR>\<C-W>h:bd!\<CR>" | endif
@@ -102,15 +88,12 @@ endfunction
 command! OpenRanger call RangerSwitch()
 nnoremap <expr> <C-;> ((g:is_ranger_open == 1) ? ":RnvimrToggle<CR>" : ":w<CR>")
 tnoremap <C-;> <C-\><C-N><C-W>l
-nnoremap <leader>er :<C-U><C-R><C-R>='let @'. v:register .' = '. string(getreg(v:register))<CR><C-F><left>
-vnoremap <leader>et ygv:.!python3 /Users/astronaut/Workspace/code/etc/chat.py "<C-R>+"<CR>
 
 nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 xnoremap ga <Plug>(EasyAlign)
 nnoremap ga <Plug>(EasyAlign)
 nnoremap c# ?\<<C-R>=expand('<cword>')<CR>\>\C<CR>``cgN
 nnoremap c* /\<<C-R>=expand('<cword>')<CR>\>\C<CR>``cgn
-nnoremap <C-E> :WinResizerStartFocus<CR>
 nnoremap <expr> j (v:count > 5 ? "m'" . v:count : "") . 'j'
 nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
 
