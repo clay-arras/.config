@@ -1,29 +1,30 @@
 call plug#begin()
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
     Plug 'dense-analysis/ale'
+    Plug 'ctrlpvim/ctrlp.vim'
     Plug 'junegunn/vim-easy-align'
     Plug 'mg979/vim-visual-multi', {'branch': 'master'}
     Plug 'SirVer/ultisnips'
     Plug 'tpope/vim-commentary'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-unimpaired'
-    Plug 'tpope/vim-repeat'
     Plug 'vim-scripts/YankRing.vim'
-    Plug 'rafi/awesome-vim-colorschemes'
+    Plug 'flazz/vim-colorschemes'
     Plug 'jiangmiao/auto-pairs'
     Plug 'wellle/targets.vim'
     Plug 'justinmk/vim-sneak'
-    Plug 'terryma/vim-expand-region'
-    Plug 'vim-airline/vim-airline'
-    Plug 'kevinhwang91/rnvimr'
+    Plug 'voldikss/vim-floaterm'
+    Plug 'simeji/winresizer'
 call plug#end()
 filetype plugin indent on
 syntax on
 
 set t_Co=256
 set termguicolors
+if !exists("g:colors_name") || g:colors_name == 'default'
+    colorscheme gruvbox
+endif
 highlight Normal guibg=NONE ctermbg=NONE
-highlight NormalFloat guibg=NONE ctermbg=NONE
+highlight clear StatusLine
 
 set autoindent
 set expandtab
@@ -31,15 +32,15 @@ set hlsearch
 set incsearch
 set showcmd
 set showmatch
-set clipboard=unnamedplus
+set clipboard=unnamed
 set shiftwidth=4
 set softtabstop=4
 set tabstop=4
 set wildmenu
 set wildmode=longest,list
-set confirm
-set nowrap
 set mouse=
+set nowrap
+set cursorline
 
 set number relativenumber
 augroup Numbertoggle
@@ -48,25 +49,29 @@ augroup Numbertoggle
     autocmd BufLeave,FocusLost,InsertEnter * set norelativenumber
 augroup END
 
+let g:UltiSnipsExpandTrigger="<CR>"
+let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
 let g:yankring_replace_n_nkey = ']p'
 let g:yankring_replace_n_pkey = '[p'
 let g:winresizer_start_key = ''
-let g:expand_region_text_objects = {'i]':1,'ib':1,'iB':1,'a]':1,'ab':1,'aB':1}
-let g:airline_section_error = ''
-let g:airline_section_warning = ''
-
-let g:UltiSnipsExpandTrigger="<CR>"
-let g:UltiSnipsSnippetDirectories = ['~/.config/nvim/UltiSnips', 'UltiSnips']
 let g:ale_linters = { 'cpp': ['g++'], 'c': ['gcc'] }
 let g:ale_cpp_cc_executable = 'g++'
 let g:ale_cpp_cc_options = '-Wall -O2 -std=c++17 -D LOCAL -I /usr/local/include'
-let g:rnvimr_draw_border = 0
-let g:rnvimr_layout = { 'relative':'editor', 'width':float2nr(round(0.5*&columns)), 'height':float2nr(round(1*&lines)), 'col':0, 'row':0, 'style': 'minimal'}
 
+let g:gtimeComp = ['term cd %:p:h; gtime -f "\nMem: \%Mkb\nTime: \%es"', '']
+let g:gppComp = [ "g++-12 -std=c++17 -D LOCAL -I /usr/local/include -Wl,-stack_size,0x10000000 -O2 ",
+                \ "-Wall -Wextra -Wshadow -Wconversion -Wfloat-equal -Wduplicated-cond -Wlogical-op ",
+                \ "-ggdb -fsanitize-undefined-trap-on-error -o ." ]
+augroup CPP
+    autocmd!
+    autocmd FileType cpp command! -bar Compile write | execute join(g:gtimeComp) . join(g:gppComp) . "%:r %"
+    autocmd FileType cpp command! Run write | silent execute "!" . join(g:gppComp) . "%:r %" | silent execute join(g:gtimeComp) . './.%:r;'
+    autocmd FileType cpp nnoremap <buffer> <leader><leader>c :Run<CR>
+augroup END
 augroup Misc
     autocmd!
+    autocmd BufEnter * silent! lcd %:p:h
     autocmd BufWritePre * :%s/\s\+$//e
-    autocmd BufWritePost ~/.config/nvim/init.vim source %
 augroup END
 
 let g:esc_j_last_time = 0
@@ -79,26 +84,22 @@ endfunction
 inoremap <expr> j JKescape('j')
 inoremap <expr> k JKescape('k')
 
-if exists("g:is_ranger_open") == 0 | let g:is_ranger_open = 0 | endif
-function! RangerSwitch()
-    if g:is_ranger_open == 0 | execute "norm :vnew\<CR>\<C-W>l:RnvimrToggle\<CR>" | endif
-    if g:is_ranger_open == 1 | execute "norm :RnvimrToggle\<CR>\<C-\>\<C-N>:RnvimrToggle\<CR>\<C-W>h:bd!\<CR>" | endif
-    let g:is_ranger_open = xor(g:is_ranger_open, 1)
+let g:is_term_open = 0
+if exists("g:is_term_open") == 0 | let g:is_term_open = 0 | endif
+function! TermSwitch()
+    if g:is_term_open == 0 | execute "norm :FloatermNew --height=0.95 --width=0.5 --wintype=float --position=right\<CR>" | endif
+    if g:is_term_open == 1 | execute "norm :FloatermToggle\<CR>" | endif
+    let g:is_term_open = 1
 endfunction
-command! OpenRanger call RangerSwitch()
-nnoremap <expr> <C-;> ((g:is_ranger_open == 1) ? ":RnvimrToggle<CR>" : ":w<CR>")
-tnoremap <C-;> <C-\><C-N><C-W>l
+nnoremap <C-\> :call TermSwitch()<CR>
+tnoremap <C-\> <C-\><C-n>:FloatermToggle<CR>
 
+nnoremap <C-E> :WinResizerStartFocus<CR>
 nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 xnoremap ga <Plug>(EasyAlign)
 nnoremap ga <Plug>(EasyAlign)
-nnoremap c# ?\<<C-R>=expand('<cword>')<CR>\>\C<CR>``cgN
-nnoremap c* /\<<C-R>=expand('<cword>')<CR>\>\C<CR>``cgn
 nnoremap <expr> j (v:count > 5 ? "m'" . v:count : "") . 'j'
 nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
-
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-P>" : "\<S-Tab>"
-inoremap <expr> <Tab> pumvisible() ? "\<C-N>" : "\<Tab>"
 vnoremap / <Esc>/\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
 vnoremap ? <Esc>?\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
 vnoremap J :m '>+1<CR>gv=gv
