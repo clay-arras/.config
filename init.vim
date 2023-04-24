@@ -66,7 +66,7 @@ augroup CPP
     autocmd!
     autocmd FileType cpp command! -bar Compile write | execute join(g:gtimeComp) . join(g:gppComp) . "%:r %"
     autocmd FileType cpp command! Run write | silent execute "!" . join(g:gppComp) . "%:r %" | silent execute join(g:gtimeComp) . './.%:r;'
-    autocmd FileType cpp nnoremap <buffer> <leader><leader>c :Run<CR>
+    autocmd FileType cpp nnoremap <buffer> <leader><leader>c :execute 'FloatermNew --height=0.95 --width=0.4 --wintype=float --position=right run % && cat input.txt \| less'<CR>
 augroup END
 augroup Misc
     autocmd!
@@ -98,8 +98,8 @@ nnoremap <C-E> :WinResizerStartFocus<CR>
 nnoremap <expr> gp '`[' . strpart(getregtype(), 0, 1) . '`]'
 xnoremap ga <Plug>(EasyAlign)
 nnoremap ga <Plug>(EasyAlign)
-nnoremap <expr> j (v:count > 5 ? "m'" . v:count : "") . 'j'
-nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
+nnoremap <expr> j (v:count > 9 ? "m'" . v:count : "") . 'j'
+nnoremap <expr> k (v:count > 9 ? "m'" . v:count : "") . 'k'
 vnoremap / <Esc>/\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
 vnoremap ? <Esc>?\%><C-R>=line("'<")-1<CR>l\%<<C-R>=line("'>")+1<CR>l
 vnoremap J :m '>+1<CR>gv=gv
